@@ -8,7 +8,7 @@ from discord.member import Member
 from source.default import DefaultSource
 from source.interface import SourceInterface
 
-intents: Intents = Intents(guilds=True)
+intents: Intents = Intents(guilds=True, messages=True)
 bot = commands.Bot(command_prefix='.', intents=intents)
 source: SourceInterface = DefaultSource()
 
