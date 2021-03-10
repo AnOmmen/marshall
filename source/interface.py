@@ -1,21 +1,20 @@
-from psycopg2._psycopg import connection
+from discord import Guild
+from discord.ext.commands import Context
 
 
 class SourceInterface:
-    _conn: connection
 
-    def __init__(self):
-        self._conn = self._connect()
-        pass
-
-    def _connect(self) -> connection:
+    def deactivate_guild(self, guild: Guild):
         raise NotImplementedError
 
-    def close(self):
-        self._conn.close()
-
-    def deactivate_guild(self, guild_id):
+    def get_guild_guest_role(self, ctx: Context) -> str:
         raise NotImplementedError
 
-    def register_guild(self, guild_id) -> bool:
+    def get_guild_guest_role_id(self, ctx: Context) -> int:
+        raise NotImplementedError
+
+    def register_guild(self, guild: Guild) -> bool:
+        raise NotImplementedError
+
+    def set_guild_guest_role_id(self, ctx: Context, id: int):
         raise NotImplementedError
