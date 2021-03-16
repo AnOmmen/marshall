@@ -1,7 +1,7 @@
 import os
 import psycopg2
 
-from context.marshall_context import MarshallContext
+from context.application import ApplicationContext
 from datetime import datetime
 from discord import Guild, Role
 from psycopg2._psycopg import connection
@@ -49,10 +49,10 @@ class PostgresSource(SourceInterface):
         self._conn.commit()
         curs.close()
 
-    def get_guild_guest_role(self, ctx: MarshallContext) -> str:
+    def get_guild_guest_role(self, ctx: ApplicationContext) -> str:
         return self._get_guild_attribute(ctx.guild.id, 'guest_role')
 
-    def get_guild_guest_role_id(self, ctx: MarshallContext) -> int:
+    def get_guild_guest_role_id(self, ctx: ApplicationContext) -> int:
         guest_role_id = self._get_guild_attribute(ctx.guild.id, 'guest_role_id')
         if guest_role_id is None:
             return ctx.init_guild_guest_role()
@@ -76,7 +76,7 @@ class PostgresSource(SourceInterface):
         curs.close()
         return True
 
-    def set_guild_guest_role_id(self, ctx: MarshallContext, id: int):
+    def set_guild_guest_role_id(self, ctx: ApplicationContext, id: int):
         curs: cursor = self._conn.cursor()
         curs.execute(
             'UPDATE ' + self.table_guild_registry + ' SET guest_role_id = %s WHERE id = %s',

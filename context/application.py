@@ -5,7 +5,7 @@ from discord.ext.commands import Context
 from source.interface import SourceInterface
 
 
-class MarshallContext(Context):
+class ApplicationContext(Context):
     _source: SourceInterface
 
     def __init__(self, ctx: Context, source: SourceInterface):

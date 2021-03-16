@@ -1,10 +1,10 @@
 import os
 
-from context.marshall_context import MarshallContext
+from context.application import ApplicationContext
 from discord import Guild, Intents, Member, Role
 from discord.ext.commands import Bot, Context
 from discord.user import BaseUser
-from service.interface import ServiceInterface
+from service.base import Service
 from service.set import SetService
 from source.postgres import PostgresSource
 from source.interface import SourceInterface
@@ -12,7 +12,7 @@ from source.interface import SourceInterface
 intents: Intents = Intents(guilds=True, members=True, messages=True)
 bot = Bot(command_prefix='.', intents=intents)
 source: SourceInterface = PostgresSource()
-set_service: ServiceInterface = SetService(source)
+set_service: Service = SetService(source)
 
 
 @bot.command()
@@ -33,7 +33,7 @@ async def role(ctx: Context, *, role_name: str):
 
 @bot.command()
 async def set(ctx: Context, *args):
-    await set_service.handle(MarshallContext(ctx, source), args)
+    await set_service.handle(ApplicationContext(ctx, source), args)
 
 
 @bot.event
