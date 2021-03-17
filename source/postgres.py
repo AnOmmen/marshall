@@ -1,14 +1,15 @@
 import os
 import psycopg2
 
-from context.application import ApplicationContext
 from datetime import datetime
-from discord import Guild, Role
+from discord import Guild
+from discord.ext.commands import Context
 from psycopg2._psycopg import connection
 from psycopg2._psycopg import cursor
 from psycopg2.extras import RealDictCursor
 from source.exception.guild_not_found import GuildNotFoundError
 from source.interface import SourceInterface
+from typing import Optional
 
 
 class PostgresSource(SourceInterface):
@@ -49,17 +50,11 @@ class PostgresSource(SourceInterface):
         self._conn.commit()
         curs.close()
 
-    def get_guild_guest_role(self, ctx: ApplicationContext) -> str:
+    def get_guild_guest_role(self, ctx: Context) -> str:
         return self._get_guild_attribute(ctx.guild.id, 'guest_role')
 
-    def get_guild_guest_role_id(self, ctx: ApplicationContext) -> int:
-        guest_role_id = self._get_guild_attribute(ctx.guild.id, 'guest_role_id')
-        if guest_role_id is None:
-            return ctx.init_guild_guest_role()
-        guest_role: Role = ctx.guild.get_role(guest_role_id)
-        if guest_role is None:
-            return ctx.init_guild_guest_role()
-        return guest_role_id
+    def get_guild_guest_role_id(self, ctx: Context) -> Optional[int]:
+        return self._get_guild_attribute(ctx.guild.id, 'guest_role_id')
 
     def register_guild(self, guild: Guild) -> bool:
         curs: cursor = self._conn.cursor()
@@ -76,10 +71,26 @@ class PostgresSource(SourceInterface):
         curs.close()
         return True
 
-    def set_guild_guest_role_id(self, ctx: ApplicationContext, id: int):
+    def set_guild_guest_role_comp(self, ctx: Context, name: str, id: int):
+        curs: cursor = self._conn.cursor()
+        curs.execute(
+            'UPDATE ' + self.table_guild_registry + ' SET guest_role = %s,  guest_role_id = %s WHERE id = %s',
+            [name, id, ctx.guild.id])
+        self._conn.commit()
+        curs.close()
+
+    def set_guild_guest_role_id(self, ctx: Context, id: int):
         curs: cursor = self._conn.cursor()
         curs.execute(
             'UPDATE ' + self.table_guild_registry + ' SET guest_role_id = %s WHERE id = %s',
             [id, ctx.guild.id])
+        self._conn.commit()
+        curs.close()
+
+    def set_guild_member_role_comp(self, ctx: Context, name: str, id: int):
+        curs: cursor = self._conn.cursor()
+        curs.execute(
+            'UPDATE ' + self.table_guild_registry + ' SET member_role = %s, member_role_id = %s WHERE id = %s',
+            [name, id, ctx.guild.id])
         self._conn.commit()
         curs.close()

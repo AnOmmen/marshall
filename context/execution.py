@@ -11,3 +11,9 @@ class ExecutionContext(ApplicationContext):
         super().__init__(ctx, ctx._source)
         self.flags = flags
         self.params = params
+
+    def has_flag(self, flag_name) -> bool:
+        for flag in self.flags.keys():
+            if flag.name == flag_name:
+                return True
+        return False

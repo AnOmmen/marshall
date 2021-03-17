@@ -8,18 +8,15 @@ from service.exception.unexpected_parameters import UnexpectedParametersError
 from service.exception.unrecognized_alias import UnrecognizedAliasError
 from service.exception.unrecognized_flag import UnrecognizedFlagError
 from service.exception.service_error import ServiceError
-from source.interface import SourceInterface
-from typing import Dict, List, Union
+from typing import Dict, List, Optional
 from utils.str_gen import StrGen
 
 
 class Service:
     _alias_map: Dict[str, str]
     _flag_map: Dict[str, Flag]
-    _source: SourceInterface
 
-    def __init__(self, source: SourceInterface):
-        self._source = source
+    def __init__(self):
         self._alias_map = {}
         self._flag_map = {}
         for flag in self._flags():
@@ -32,7 +29,7 @@ class Service:
         access_level = self._access_level()
 
         if access_level == AccessLevel.MEMBER:
-            guest_role_id = self._source.get_guild_guest_role_id(ctx)
+            guest_role_id = await ctx.get_guild_guest_role_id()
             for role in ctx.author.roles:
                 if role.id == guest_role_id:
                     await ctx.send(StrGen.mistake_inj().capitalize() + "! " + ctx.command.name +
@@ -69,13 +66,13 @@ class Service:
             flagged_args = OrderedDict()
             flag_params: List[str] = []
             service_params: List[str] = []
-            current_flag: Union[Flag, None] = None
+            current_flag: Optional[Flag] = None
             for arg in args[0]:
 
                 # Check for flag (-) or alias (--) and only treat it as such if it has following characters
                 if arg[0] == '-' and len(arg) > 1 and arg[1] != '-' or arg[:2] == '--' and len(arg) > 2:
 
-                    flag_name: Union[None, str] = None
+                    flag_name: Optional[str] = None
 
                     # Check if argument is an alias (--)
                     if arg[1] == '-':

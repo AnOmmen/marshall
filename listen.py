@@ -12,7 +12,7 @@ from source.interface import SourceInterface
 intents: Intents = Intents(guilds=True, members=True, messages=True)
 bot = Bot(command_prefix='.', intents=intents)
 source: SourceInterface = PostgresSource()
-set_service: Service = SetService(source)
+set_service: Service = SetService()
 
 
 @bot.command()
