@@ -2,17 +2,17 @@ from collections import OrderedDict
 from context.execution import ExecutionContext
 from context.application import ApplicationContext
 from data.flag import Flag
-from service.definition.access_level import AccessLevel
-from service.exception.missing_parameters import MissingParametersError
-from service.exception.unexpected_parameters import UnexpectedParametersError
-from service.exception.unrecognized_alias import UnrecognizedAliasError
-from service.exception.unrecognized_flag import UnrecognizedFlagError
-from service.exception.service_error import ServiceError
+from command.definition.access_level import AccessLevel
+from command.exception.missing_parameters import MissingParametersError
+from command.exception.unexpected_parameters import UnexpectedParametersError
+from command.exception.unrecognized_alias import UnrecognizedAliasError
+from command.exception.unrecognized_flag import UnrecognizedFlagError
+from command.exception.command_error import CommandError
 from typing import Dict, List, Optional
 from utils.str_gen import StrGen
 
 
-class Service:
+class Command:
     _alias_map: Dict[str, str]
     _flag_map: Dict[str, Flag]
 
@@ -120,10 +120,10 @@ class Service:
                             (current_flag.num_params == -1 or len(flag_params) < current_flag.num_params):
                         flag_params.append(arg)
 
-                    # Otherwise add the parameter to the service parameter list
+                    # Otherwise add the parameter to the command parameter list
                     else:
 
-                        # Check if the service is still expecting parameters, otherwise raise an error
+                        # Check if the command is still expecting parameters, otherwise raise an error
                         if self._num_params() == -1 or len(service_params) < self._num_params():
                             service_params.append(arg)
                         else:
@@ -138,11 +138,11 @@ class Service:
 
                 flagged_args[current_flag] = flag_params
 
-            # Raise an error if the expected number of service parameters are not present
+            # Raise an error if the expected number of command parameters are not present
             if self._num_params() != -1 and len(service_params) < self._num_params():
                 raise MissingParametersError(self._num_params() - len(service_params))
 
             await self._execute(ExecutionContext(ctx, flagged_args, service_params))
 
-        except ServiceError as error:
+        except CommandError as error:
             await ctx.send(error.message)

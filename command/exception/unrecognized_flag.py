@@ -1,7 +1,7 @@
-from service.exception.service_error import ServiceError
+from command.exception.command_error import CommandError
 
 
-class UnrecognizedFlagError(ServiceError):
+class UnrecognizedFlagError(CommandError):
     _unrecognized_flag = 'Unrecognized flag given: {flag_name}'
 
     def __init__(self, flag_name: str):

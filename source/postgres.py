@@ -32,7 +32,7 @@ class PostgresSource(SourceInterface):
         statement = 'SELECT'
         for attribute in attributes:
             statement += ' ' + attribute + ','
-        statement = statement[:-1] + ' FROM ' + self.table_guild_registry + ' WHERE id = %s'
+        statement = statement[:-1] + ' FROM ' + self.table_guild_registry + ' WHERE guild_id = %s'
         curs.execute(statement, [guild_id])
         if curs.rowcount == 0:
             raise GuildNotFoundError(guild_id)
@@ -45,7 +45,7 @@ class PostgresSource(SourceInterface):
     def deactivate_guild(self, guild: Guild):
         curs: cursor = self._conn.cursor()
         curs.execute(
-            'UPDATE ' + self.table_guild_registry + ' SET active = %s, deactivated_at = %s WHERE id = %s',
+            'UPDATE ' + self.table_guild_registry + ' SET active = %s, deactivated_at = %s WHERE guild_id = %s',
             [False, datetime.now(), guild.id])
         self._conn.commit()
         curs.close()
@@ -61,12 +61,14 @@ class PostgresSource(SourceInterface):
         try:
             active = self._get_guild_attribute(guild.id, 'active')
             if not active:
-                curs.execute('UPDATE ' + self.table_guild_registry + ' SET active = %s WHERE id = %s', [True, guild.id])
+                curs.execute(
+                    'UPDATE ' + self.table_guild_registry + ' SET active = %s WHERE guild_id = %s',
+                    [True, guild.id])
             else:
                 curs.close()
                 return False
         except GuildNotFoundError:
-            curs.execute('INSERT INTO ' + self.table_guild_registry + ' (id) VALUES (%s)', [guild.id])
+            curs.execute('INSERT INTO ' + self.table_guild_registry + ' (guild_id) VALUES (%s)', [guild.id])
         self._conn.commit()
         curs.close()
         return True
@@ -74,7 +76,7 @@ class PostgresSource(SourceInterface):
     def set_guild_guest_role_comp(self, ctx: Context, name: str, id: int):
         curs: cursor = self._conn.cursor()
         curs.execute(
-            'UPDATE ' + self.table_guild_registry + ' SET guest_role = %s,  guest_role_id = %s WHERE id = %s',
+            'UPDATE ' + self.table_guild_registry + ' SET guest_role = %s,  guest_role_id = %s WHERE guild_id = %s',
             [name, id, ctx.guild.id])
         self._conn.commit()
         curs.close()
@@ -82,7 +84,7 @@ class PostgresSource(SourceInterface):
     def set_guild_guest_role_id(self, ctx: Context, id: int):
         curs: cursor = self._conn.cursor()
         curs.execute(
-            'UPDATE ' + self.table_guild_registry + ' SET guest_role_id = %s WHERE id = %s',
+            'UPDATE ' + self.table_guild_registry + ' SET guest_role_id = %s WHERE guild_id = %s',
             [id, ctx.guild.id])
         self._conn.commit()
         curs.close()
@@ -90,7 +92,7 @@ class PostgresSource(SourceInterface):
     def set_guild_member_role_comp(self, ctx: Context, name: str, id: int):
         curs: cursor = self._conn.cursor()
         curs.execute(
-            'UPDATE ' + self.table_guild_registry + ' SET member_role = %s, member_role_id = %s WHERE id = %s',
+            'UPDATE ' + self.table_guild_registry + ' SET member_role = %s, member_role_id = %s WHERE guild_id = %s',
             [name, id, ctx.guild.id])
         self._conn.commit()
         curs.close()

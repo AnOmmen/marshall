@@ -1,7 +1,7 @@
-from service.exception.service_error import ServiceError
+from command.exception.command_error import CommandError
 
 
-class MissingParametersError(ServiceError):
+class MissingParametersError(CommandError):
     _missing_parameters = 'Missing {num_params} parameter'
     _for_flag = ' for {flag_name}.'
 

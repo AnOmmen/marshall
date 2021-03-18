@@ -4,15 +4,15 @@ from context.application import ApplicationContext
 from discord import Guild, Intents, Member, Role
 from discord.ext.commands import Bot, Context
 from discord.user import BaseUser
-from service.base import Service
-from service.set import SetService
+from command.base import Command
+from command.set import SetCommand
 from source.postgres import PostgresSource
 from source.interface import SourceInterface
 
 intents: Intents = Intents(guilds=True, members=True, messages=True)
 bot = Bot(command_prefix='.', intents=intents)
 source: SourceInterface = PostgresSource()
-set_service: Service = SetService()
+set_service: Command = SetCommand()
 
 
 @bot.command()

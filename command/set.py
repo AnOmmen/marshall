@@ -1,11 +1,11 @@
 from context.execution import ExecutionContext
 from data.flag import Flag
 from discord import Role
-from service.base import Service
+from command.base import Command
 from typing import List, Optional
 
 
-class SetService(Service):
+class SetCommand(Command):
     _role_creation_reason = 'Requested by the .set command.'
     _role_not_found = 'Role by the name of "{role_name}" not found. If you would like meow to create the role, please' \
                       ' include the -c, --create, flag.'

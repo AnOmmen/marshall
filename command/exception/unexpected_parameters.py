@@ -1,8 +1,8 @@
-from service.exception.service_error import ServiceError
+from command.exception.command_error import CommandError
 from typing import List
 
 
-class UnexpectedParametersError(ServiceError):
+class UnexpectedParametersError(CommandError):
     _unexpected_parameters = 'Unexpected parameters'
     _for_flag = ' for {flag_name}:'
 
